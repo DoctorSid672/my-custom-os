@@ -12,46 +12,44 @@ jobs:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
 
-      - name: Install Core ISO Compilers and Live Tools
+      - name: Install Core ISO Compilers
         run: |
           sudo apt-get update
           sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common wget
 
-      - name: Fetch and Assemble Functional Linux Kernel Base
+      - name: Fetch and Assemble Stable Core Linux Kernel
         run: |
-          mkdir -p os_root/boot/grub
-          mkdir -p os_root/isolinux
-          mkdir -p os_root/live
+          mkdir -p os_root/boot/isolinux
           
-          # Download a pre-compiled, secure, ultra-lightweight Live Linux kernel system core
-          wget -O os_root/live/vmlinuz https://github.com || echo "Kernel fetch fallback"
-          wget -O os_root/live/initrd.img https://github.com || echo "Initrd fetch fallback"
+          # Download highly-compatible, uncompressed kernel core engine components
+          wget -O os_root/boot/vmlinuz http://ibiblio.org
+          wget -O os_root/boot/core.gz http://ibiblio.org
           
-          # Inject your custom text logs inside the root filesystem paths
+          # Inject your custom configurations and metadata log files
           echo "Welcome to GamerOS Custom Build Setup!" > os_root/welcome.txt
           echo "Pre-installed App Manifest: firefox, vlc, mousepad, discord" > os_root/manifest.log
           
-          # Add standard isolinux bootloader components
-          cp /usr/lib/ISOLINUX/isolinux.bin os_root/isolinux/
-          cp /usr/lib/syslinux/modules/bios/ldlinux.c32 os_root/isolinux/
+          # Add basic isolinux engine hooks
+          cp /usr/lib/ISOLINUX/isolinux.bin os_root/boot/isolinux/
+          cp /usr/lib/syslinux/modules/bios/ldlinux.c32 os_root/boot/isolinux/
           
-          # Create mandatory Isolinux boot configuration instructions mapped to the running kernel core
-          cat << 'EOF' > os_root/isolinux/isolinux.cfg
+          # Create a bulletproof boot instruction configuration file mapped exactly to the new files
+          cat << 'EOF' > os_root/boot/isolinux/isolinux.cfg
           default gameros
           prompt 0
           timeout 10
           label gameros
-            kernel /live/vmlinuz
-            append initrd=/live/initrd.img boot=live quiet
+            kernel /boot/vmlinuz
+            append initrd=/boot/core.gz loglevel=3 cgroup_disable=memory
           EOF
 
       - name: Compile and Output Real Bootable ISO File
         run: |
-          # Inject full El Torito boot sector flags to bypass the iPXE network fallback crash
+          # Package using strict El Torito hardware paths relative to the boot root folder
           mkisofs -o custom-operating-system.iso \
-            -b isolinux/isolinux.bin -c isolinux/boot.cat \
+            -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -R -J -v -V "Vertex OS" os_root/
+            -R -J -v -V "GAMEROS" os_root/
 
       - name: Upload Finished Bootable ISO Artifact
         uses: actions/upload-artifact@v4
