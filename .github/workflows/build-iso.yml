@@ -17,30 +17,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common wget
 
-      - name: Fetch and Assemble Stable Core Linux Kernel
+      - name: Fetch and Assemble Native 64-Bit Linux Kernel
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Download highly-compatible, uncompressed kernel core engine components
-          wget -O os_root/boot/vmlinuz http://ibiblio.org
-          wget -O os_root/boot/core.gz http://ibiblio.org
+          # Download official 64-bit uncompressed kernel core engine components
+          wget -O os_root/boot/vmlinuz64 http://ibiblio.org
+          wget -O os_root/boot/corepure64.gz http://ibiblio.org
           
           # Inject your custom configurations and metadata log files
           echo "Welcome to GamerOS Custom Build Setup!" > os_root/welcome.txt
           echo "Pre-installed App Manifest: firefox, vlc, mousepad, discord" > os_root/manifest.log
           
-          # Add basic isolinux engine hooks
+          # Add standard isolinux engine components
           cp /usr/lib/ISOLINUX/isolinux.bin os_root/boot/isolinux/
           cp /usr/lib/syslinux/modules/bios/ldlinux.c32 os_root/boot/isolinux/
           
-          # Create a bulletproof boot instruction configuration file mapped exactly to the new files
+          # Create a custom boot instruction configuration file mapped exactly to the 64-bit binaries
           cat << 'EOF' > os_root/boot/isolinux/isolinux.cfg
           default gameros
           prompt 0
           timeout 10
           label gameros
-            kernel /boot/vmlinuz
-            append initrd=/boot/core.gz loglevel=3 cgroup_disable=memory
+            kernel /boot/vmlinuz64
+            append initrd=/boot/corepure64.gz loglevel=3 cgroup_disable=memory
           EOF
 
       - name: Compile and Output Real Bootable ISO File
@@ -49,7 +49,7 @@ jobs:
           mkisofs -o custom-operating-system.iso \
             -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -R -J -v -V "GAMEROS" os_root/
+            -R -J -v -V "VortexOS" os_root/
 
       - name: Upload Finished Bootable ISO Artifact
         uses: actions/upload-artifact@v4
