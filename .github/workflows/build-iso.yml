@@ -9,19 +9,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install System Compilers
+      - name: Install Live Build Utilities
         run: |
           sudo apt-get update
           sudo apt-get install -y live-build xorriso squashfs-tools
 
-      - name: Build the Operating System
+      - name: Configure Operating System Base
         run: |
-          sudo bash build-iso.sh || sudo bash build.sh || echo "Build file fallback executed"
+          mkdir -p live-build-os
+          cd live-build-os
+          # Set up core system parameters
+          sudo lb config --architecture amd64 --binary-images iso-hybrid --distribution bookworm
+          
+          # Add your custom apps directly into the installation manifest
+          echo "task-xfce-desktop firefox-esr vlc mousepad discord" | sudo tee config/package-lists/my-apps.list.chroot
+
+      - name: Compile and Compress into Bootable ISO
+        run: |
+          cd live-build-os
+          # Trigger the master compilation engine
+          sudo lb build
+
+      - name: Move Finished ISO to Output Directory
+        run: |
+          mv live-build-os/*.iso ./custom-operating-system.iso || echo "No root ISO found"
 
       - name: Upload Finished Bootable ISO Artifact
         uses: actions/upload-artifact@v4
         with:
           name: custom-os-iso
-          path: |
-            *.iso
-            *.hybrid.iso
+          path: custom-operating-system.iso
