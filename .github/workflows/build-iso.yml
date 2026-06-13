@@ -21,9 +21,9 @@ jobs:
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Download official 64-bit v11 legacy kernel core engine components
-          wget -O os_root/boot/vmlinuz64 http://ibiblio.org
-          wget -O os_root/boot/corepure64.gz http://ibiblio.org
+          # Download official 64-bit v11 legacy core components from historical mirrors
+          wget -O os_root/boot/vmlinuz64 https://archive.org
+          wget -O os_root/boot/corepure64.gz https://archive.org
           
           # Inject your custom configurations and metadata log files
           echo "Welcome to GamerOS Custom Build Setup!" > os_root/welcome.txt
@@ -48,7 +48,7 @@ jobs:
           mkisofs -o custom-operating-system.iso \
             -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -R -J -v -VertexOS" os_root/
+            -R -J -v -V "VertexOS" os_root/
 
       - name: Upload Finished Bootable ISO Artifact
         uses: actions/upload-artifact@v4
