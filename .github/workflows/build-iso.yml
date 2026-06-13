@@ -15,15 +15,15 @@ jobs:
       - name: Install Core ISO Compilers
         run: |
           sudo apt-get update
-          sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common wget
+          sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common linux-image-amd64
 
-      - name: Fetch and Assemble Legacy Core Linux Kernel
+      - name: Assemble Core Linux Kernel Layout
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Download official 64-bit v11 legacy core components from verified mirrors
-          wget -O os_root/boot/vmlinuz64 https://ibiblio.org
-          wget -O os_root/boot/corepure64.gz https://ibiblio.org
+          # Copy the pre-installed local kernel files directly from the host system
+          cp /boot/vmlinuz* os_root/boot/vmlinuz64
+          cp /boot/initrd.img* os_root/boot/corepure64.gz
           
           # Inject your custom configurations and metadata log files
           echo "Welcome to VertexOS Custom Build Setup!" > os_root/welcome.txt
@@ -33,7 +33,7 @@ jobs:
           cp /usr/lib/ISOLINUX/isolinux.bin os_root/boot/isolinux/
           cp /usr/lib/syslinux/modules/bios/ldlinux.c32 os_root/boot/isolinux/
           
-          # Create a legacy boot instruction configuration file
+          # Create a bulletproof boot instruction configuration file
           cat << 'EOF' > os_root/boot/isolinux/isolinux.cfg
           default gameros
           prompt 0
