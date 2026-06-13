@@ -21,9 +21,14 @@ jobs:
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Download official Alpine Linux uncompressed virtual kernel files (Ultra compatible)
-          wget -O os_root/boot/vmlinuz64 https://alpinelinux.org
-          wget -O os_root/boot/corepure64.gz https://alpinelinux.org
+          # Assemble the unclipped links out of tiny text fragments
+          URL_PART1="https://alpinelinux.org"
+          URL_PART2="/x86_64/netboot/vmlinuz-virt"
+          URL_PART3="/x86_64/netboot/initramfs-virt"
+          
+          # Trigger the secure file downloads using the stitched paths
+          wget -O os_root/boot/vmlinuz64 "${URL_PART1}${URL_PART2}"
+          wget -O os_root/boot/corepure64.gz "${URL_PART1}${URL_PART3}"
           
           # Inject your custom configurations and metadata log files
           echo "Welcome to VertexOS Custom Build Setup!" > os_root/welcome.txt
