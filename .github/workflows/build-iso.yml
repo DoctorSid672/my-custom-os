@@ -21,12 +21,12 @@ jobs:
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Download official 64-bit v11 legacy core components from historical mirrors
-          wget -O os_root/boot/vmlinuz64 https://archive.org
-          wget -O os_root/boot/corepure64.gz https://archive.org
+          # Download official 64-bit v11 legacy core components from verified mirrors
+          wget -O os_root/boot/vmlinuz64 https://ibiblio.org
+          wget -O os_root/boot/corepure64.gz https://ibiblio.org
           
           # Inject your custom configurations and metadata log files
-          echo "Welcome to GamerOS Custom Build Setup!" > os_root/welcome.txt
+          echo "Welcome to VertexOS Custom Build Setup!" > os_root/welcome.txt
           echo "Pre-installed App Manifest: firefox, vlc, mousepad, discord" > os_root/manifest.log
           
           # Add standard isolinux engine components
