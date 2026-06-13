@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build-iso:
@@ -19,15 +19,10 @@ jobs:
 
       - name: Assemble Custom Operating System Layout
         run: |
-          # Create standalone structure paths
           mkdir -p os_root/boot/grub
           mkdir -p os_root/system_files
-          
-          # Inject your custom configurations directly into the layout files
           echo "Welcome to GamerOS Custom Build Setup!" > os_root/system_files/welcome.txt
           echo "Pre-installed App Manifest: firefox-esr, vlc, mousepad, discord" > os_root/system_files/manifest.log
-          
-          # Create basic GRUB boot menu sequence file configurations
           cat << 'EOF' > os_root/boot/grub/grub.cfg
           set timeout=5
           set default=0
@@ -38,10 +33,7 @@ jobs:
 
       - name: Compile and Output Standalone ISO File
         run: |
-          # Use standard mkisofs toolchain to bypass system host restrictions
-          mkisofs -o custom-operating-system.iso \
-            -R -J -v -V "GAMEROS" \
-            os_root/
+          mkisofs -o custom-operating-system.iso -R -J -v -V "GAMEROS" os_root/
 
       - name: Upload Finished Bootable ISO Artifact
         uses: actions/upload-artifact@v4
