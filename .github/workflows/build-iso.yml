@@ -15,15 +15,15 @@ jobs:
       - name: Install Core ISO Compilers
         run: |
           sudo apt-get update
-          sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common linux-image-amd64
+          sudo apt-get install -y genisoimage mkisofs isolinux syslinux-common wget
 
-      - name: Assemble Core Linux Kernel Layout
+      - name: Fetch and Assemble Lightweight Linux Kernel
         run: |
           mkdir -p os_root/boot/isolinux
           
-          # Copy the pre-installed local kernel files directly from the host system
-          cp /boot/vmlinuz* os_root/boot/vmlinuz64
-          cp /boot/initrd.img* os_root/boot/corepure64.gz
+          # Download official Alpine Linux uncompressed virtual kernel files (Ultra compatible)
+          wget -O os_root/boot/vmlinuz64 https://alpinelinux.org
+          wget -O os_root/boot/corepure64.gz https://alpinelinux.org
           
           # Inject your custom configurations and metadata log files
           echo "Welcome to VertexOS Custom Build Setup!" > os_root/welcome.txt
